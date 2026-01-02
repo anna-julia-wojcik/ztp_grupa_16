@@ -1,0 +1,1 @@
+# wczytywanie i czyszczenie danych
