@@ -45,9 +45,7 @@ for year in years:
 # sprawdzenie czy nie brakuje stacji pomiarowych lub pomiarów w żadnych z pobranych plików
 for key, df in dataframes.items():
   if len(df.columns) < 2 or len(df) < 7:
-    Print(f"Brakuje informacji w pobranych danych z roku {key}")
-  if "Kod stacji" not in df.columns.tolist():
-    Print(f"Brakuje kodów stacji w pliku z roku {key}")
+    print(f"Brakuje informacji w pobranych danych z roku {key}")
 
 # pobranie metadanych
 metadata_url = 'https://powietrze.gios.gov.pl/pjp/archives/downloadFile/622'
@@ -69,15 +67,6 @@ try:
 except Exception as e:
     print(f"Wystąpił błąd: {e}")
 
-# sprawdzenie czy nie brakuje któregoś kodu stacji w metadanych
-all_codes = set()
-for df in dataframes.values():
-  all_codes.add(df.columns[1:])
-  
-missing = all_codes - set(dfmetadata.['Kod stacji'])
-if len(missing) > 0:
-  Print(f"W metadanych brakuje podanych kodów stacji: {missing}")
-
 # ujednolicenie formatów dataframes z róźnych lat
 for key, df in dataframes.items():
     if key == 2014:
@@ -93,6 +82,15 @@ for key, df in dataframes.items():
 # aktualizacja starych kodów na nowe
 for year, df in dataframes.items():
     df.rename(columns=new_codes, inplace=True)
+
+# sprawdzenie czy nie brakuje któregoś kodu stacji w metadanych
+all_codes = set()
+for df in dataframes.values():
+  all_codes.update(df.columns[1:])
+  
+missing = all_codes - set(dfmetadata['Kod stacji'])
+if len(missing) > 0:
+  print(f"W metadanych brakuje podanych kodów stacji: {missing}")
 
 # filtrowanie stacji na te, które pojawiają się w kaźdym roku z słownika
 non_station_cols = ['Kod stacji']
@@ -118,8 +116,8 @@ for key, df in dataframes.items():
 
 # sprawdzenie czy w każdym df mamy tyle samo stacji
 num_stations = {key: len(df.columns) - 1 for key, df in dataframes.items()}
-if len(set(num_stations.values()) != 1:
-  Print("Są różne liczby stacji w danych")
+if len(set(num_stations.values())) != 1:
+  print("Są różne liczby stacji w danych")
 
 # zmiana dnia pomiaru o północy na poprzedni jako ostatni pomiar tego dnia
 def change_midnight(df):
@@ -138,14 +136,18 @@ for key, df in dataframes.items():
 # sprawdzenie czy w każdym df mamy odpowiednią liczbę dni w danym roku
 for year, df in dataframes.items():
     days = df['Kod stacji'].dt.normalize().nunique()
-    expected_days = 366 if pd.Timestamp(year=year).is_leap_year else 365
+    expected_days = 366 if pd.Timestamp(year=year, month=1, day=1).is_leap_year else 365
   
-    if days != expected days:
-        Print(f" W roku {year} jest {expected_days} dni, a powinno być {days} dni")
+    if days != expected_days:
+        print(f" W roku {year} jest {expected_days} dni, a powinno być {days} dni")
 
 # dodanie kolumny 'Rok' aby następnie połączyć wszystkie dane w jeden plik .csv
 for key, df in dataframes.items():
     df.loc[:, 'Rok'] = key
 
-all_data = pd.concat([df for df in dataframes.values()], ignore_index=True)
-all_data.to_csv("all_data.csv", index=False)
+try:
+    all_data = pd.concat([df for df in dataframes.values()], ignore_index=True)
+    all_data.to_csv("all_data.csv", index=False)
+    print(f"Dane zostały zapisane do jednego pliku pod nazwą all_data.csv")
+except Exception as e:
+    print(f"Wystąpił błąd przy zapisywaniu danych do pliku all_data.csv: {e}")
