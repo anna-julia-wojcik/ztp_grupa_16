@@ -1,5 +1,7 @@
 from visualizations import *
 
+monthly_df = pd.read_csv('monthly_average.csv')
+
 def test_heatmap_run_without_err(monthly_df):
     heatmaps(monthly_df)
 
