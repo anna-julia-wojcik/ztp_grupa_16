@@ -1,4 +1,5 @@
 from visualizations import *
+import pytest
 
 @pytest.fixture
 def monthly_df():
