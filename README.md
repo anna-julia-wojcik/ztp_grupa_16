@@ -24,7 +24,7 @@ aby ułatwić analizę danych oraz przedstawić zmiany stężenia pyłu w czasie
 git clone https://github.com/zlewkarzbenc/ztp_grupa_16
 ```
 
-3. Utwórz wirtualne środowisko (zalecane)
+2. Utwórz wirtualne środowisko (zalecane)
 ```bash
 python -m venv venv
 source ./venv/bin/activate
