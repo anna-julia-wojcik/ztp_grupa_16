@@ -1,4 +1,10 @@
 from visualizations import *
+import pytest
+
+@pytest.fixture
+def monthly_df():
+   monthly_df = pd.read_csv("monthly_average.csv")
+   return monthly_df
 
 def test_heatmap_run_without_err(monthly_df):
     heatmaps(monthly_df)
